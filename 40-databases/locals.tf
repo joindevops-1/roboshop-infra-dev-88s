@@ -5,6 +5,10 @@ locals {
     mysql_sg_id = data.aws_ssm_parameter.mysql_sg_id.value
     rabbitmq_sg_id = data.aws_ssm_parameter.rabbitmq_sg_id.value
     database_subnet_id = split("," , data.aws_ssm_parameter.database_subnet_ids.value)[0]
+    mysql_iam_role_name = join("", [
+        for part in split("-", "${var.project}-${var.environment}-mysql") :
+        title(part)
+    ])
     /* ssh_credentials = jsondecode(
         data.aws_secretsmanager_secret_version.roboshop.secret_string
     ) */
