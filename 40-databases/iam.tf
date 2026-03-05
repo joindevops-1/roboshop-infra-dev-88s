@@ -22,7 +22,7 @@ resource "aws_iam_role" "mysql" {
 resource "aws_iam_policy" "mysql" {
   name        = local.mysql_iam_role_name
   description = "Allow mysql to read root password from SSM Parameter Store"
-  policy      = templatefile("policies/mysql.json", {
+  policy      = templatefile("iam-policy.json", {
     environment = var.environment
   })
 
