@@ -18,9 +18,10 @@ resource "terraform_data" "mongodb" {
   ]
   
   connection {
-    type     = "ssh"
-    user     = local.ssh_credentials["ssh_user"]
-    password = local.ssh_credentials["ssh_password"]
+    user     = "ec2-user"
+    #local.ssh_credentials["ssh_user"]
+    password = "DevOps321"
+    #local.ssh_credentials["ssh_password"]
     host     = aws_instance.mongodb.private_ip
   }
 
@@ -60,8 +61,10 @@ resource "terraform_data" "redis" {
   
   connection {
     type     = "ssh"
-    user     = local.ssh_credentials["ssh_user"]
-    password = local.ssh_credentials["ssh_password"]
+    user     = "ec2-user"
+    #local.ssh_credentials["ssh_user"]
+    password = "DevOps321"
+    #local.ssh_credentials["ssh_password"]
     host     = aws_instance.redis.private_ip
   }
 
@@ -101,8 +104,10 @@ resource "terraform_data" "mysql" {
   
   connection {
     type     = "ssh"
-    user     = local.ssh_credentials["ssh_user"]
-    password = local.ssh_credentials["ssh_password"]
+    user     = "ec2-user"
+    #local.ssh_credentials["ssh_user"]
+    password = "DevOps321"
+    #local.ssh_credentials["ssh_password"]
     host     = aws_instance.mysql.private_ip
   }
 
