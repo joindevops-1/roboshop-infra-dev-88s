@@ -5,9 +5,9 @@ locals {
     mysql_sg_id = data.aws_ssm_parameter.mysql_sg_id.value
     rabbitmq_sg_id = data.aws_ssm_parameter.rabbitmq_sg_id.value
     database_subnet_id = split("," , data.aws_ssm_parameter.database_subnet_ids.value)[0]
-    ssh_credentials = jsondecode(
+    /* ssh_credentials = jsondecode(
         data.aws_secretsmanager_secret_version.roboshop.secret_string
-    )
+    ) */
     common_tags = {
         Project = var.project
         Environment = var.environment
