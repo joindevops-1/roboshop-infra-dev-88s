@@ -1,23 +1,29 @@
 resource "aws_instance" "bastion" {
-    ami = local.ami_id
-    instance_type = "t3.micro"
-    vpc_security_group_ids = [local.bastion_sg_id]
-    subnet_id = local.public_subnet_id
-    iam_instance_profile = aws_iam_instance_profile.bastion.name
-    # need more for terraform
-    root_block_device {
-        volume_size = 50
-        volume_type = "gp3" # or "gp2", depending on your preference
-    }
+  ami           = local.ami_id
+  instance_type = "t3.micro"
+  subnet_id = local.public_subnet_id
+  vpc_security_group_ids = [local.bastion_sg_id]
+  iam_instance_profile = aws_iam_instance_profile.bastion.name
+  user_data = file("bastion.sh")
 
-    user_data = file("bastion.sh")
-    user_data_replace_on_change = true
-    tags = merge (
-        local.common_tags,
-        {
-            Name = "${var.project}-${var.environment}-bastion"
-        }
+  root_block_device {
+    volume_size = 50
+    volume_type = "gp3"
+    # EBS volume tags
+    tags = merge(
+      {
+          Name = "${var.project}-${var.environment}-bastion"
+      },
+    local.common_tags
     )
+  }
+
+  tags = merge(
+    {
+        Name = "${var.project}-${var.environment}-bastion"
+    },
+    local.common_tags
+  )
 }
 
 resource "aws_iam_role" "bastion" {
@@ -58,7 +64,4 @@ resource "aws_iam_instance_profile" "bastion" {
   role = aws_iam_role.bastion.name
 }
 
-/* resource "aws_iam_instance_profile" "bastion" {
-  name = "bastion"
-  role = "BastionTerraformAdmin"
-} */
+# mongodb-dev.daws88s.online
