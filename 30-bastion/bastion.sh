@@ -9,3 +9,10 @@ xfs_growfs /home
 yum install -y yum-utils
 yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
 yum -y install terraform
+
+cd /home/ec2-user
+git clone https://github.com/joindevops-1/roboshop-infra-dev-88s.git
+chown ec2-user:ec2-user -R roboshop-infra-dev-88s
+cd roboshop-infra-dev-88s/40-databases
+terraform init
+terraform apply -auto-approve
