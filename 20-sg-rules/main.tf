@@ -29,6 +29,17 @@ resource "aws_security_group_rule" "mongodb_catalogue" {
   security_group_id = local.mongodb_sg_id
 }
 
+
+resource "aws_security_group_rule" "redis_user" {
+  type              = "ingress"
+  from_port         = 6379
+  to_port           = 6379
+  protocol          = "tcp"
+  # Where traffic is coming from
+  source_security_group_id = local.user_sg_id
+  security_group_id = local.redis_sg_id
+}
+
 resource "aws_security_group_rule" "mongodb_user" {
   type              = "ingress"
   from_port         = 27017
@@ -89,6 +100,16 @@ resource "aws_security_group_rule" "catalogue_bastion" {
   security_group_id = local.catalogue_sg_id
 }
 
+resource "aws_security_group_rule" "user_bastion" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  # Where traffic is coming from
+  source_security_group_id = local.bastion_sg_id
+  security_group_id = local.user_sg_id
+}
+
 resource "aws_security_group_rule" "catalogue_backend_alb" {
   type              = "ingress"
   from_port         = 8080
@@ -97,5 +118,15 @@ resource "aws_security_group_rule" "catalogue_backend_alb" {
   # Where traffic is coming from
   source_security_group_id = local.backend_alb_sg_id
   security_group_id = local.catalogue_sg_id
+}
+
+resource "aws_security_group_rule" "user_backend_alb" {
+  type              = "ingress"
+  from_port         = 8080
+  to_port           = 8080
+  protocol          = "tcp"
+  # Where traffic is coming from
+  source_security_group_id = local.backend_alb_sg_id
+  security_group_id = local.user_sg_id
 }
 
