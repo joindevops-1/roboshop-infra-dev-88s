@@ -44,7 +44,8 @@ resource "aws_ec2_instance_state" "catalogue" {
 }
 
 resource "aws_ami_from_instance" "catalogue" {
-  name               = "${var.project}-${var.environment}-catalogue-${aws_instance.catalogue.id}"
+  # roboshop-dev-catalogue-v3-i-h468sghy
+  name               = "${var.project}-${var.environment}-catalogue-${var.app_version}-${aws_instance.catalogue.id}"
   source_instance_id = aws_instance.catalogue.id
   depends_on = [aws_ec2_instance_state.catalogue]
   tags = merge(
@@ -140,24 +141,24 @@ resource "aws_autoscaling_group" "catalogue" {
     preferences {
       min_healthy_percentage = 50
     }
-    triggers = ["tag"]
+    triggers = ["launch_template"]
   }
 
   dynamic "tag" {
     for_each = merge(
-      {
-          Name = "${var.project}-${var.environment}-catalogue"
-      },
-      local.common_tags
+        {
+            Name = "${var.project}-${var.environment}-catalogue"
+        },
+        local.common_tags
     )
     content {
       key                 = tag.key
       value               = tag.value
       propagate_at_launch = true
     }
-    
   }
 
+  # with in 15min autoscaling should be successful
   timeouts {
     delete = "15m"
   }
@@ -167,16 +168,18 @@ resource "aws_autoscaling_policy" "catalogue" {
   autoscaling_group_name = aws_autoscaling_group.catalogue.name
   name                   = "${var.project}-${var.environment}-catalogue"
   policy_type            = "TargetTrackingScaling"
+  estimated_instance_warmup = 120
 
   target_tracking_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
 
-    target_value = 5.0
+    target_value = 70.0
   }
 }
 
+# This depends on target group
 resource "aws_lb_listener_rule" "catalogue" {
   listener_arn = local.backend_alb_listener_arn
   priority     = 10
@@ -193,13 +196,14 @@ resource "aws_lb_listener_rule" "catalogue" {
   }
 }
 
-resource "terraform_data" "catalogue_local" {
+resource "terraform_data" "catalogue_delete" {
   triggers_replace = [
     aws_instance.catalogue.id
   ]
-  
   depends_on = [aws_autoscaling_policy.catalogue]
+  
+  # it executes in bastion
   provisioner "local-exec" {
-    command = "aws ec2 terminate-instances --instance-ids ${aws_instance.catalogue.id}"
+    command = "aws ec2 terminate-instances --instance-ids ${aws_instance.catalogue.id} "
   }
 }

@@ -98,3 +98,4 @@ resource "aws_security_group_rule" "catalogue_backend_alb" {
   source_security_group_id = local.backend_alb_sg_id
   security_group_id = local.catalogue_sg_id
 }
+

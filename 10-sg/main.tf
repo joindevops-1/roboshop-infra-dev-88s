@@ -1,6 +1,6 @@
 module "sg" {
     count = length(var.sg_names)
-    source = "git::https://github.com/daws-88s/terraform-aws-sg.git?ref=main"
+    source = "../../terraform-aws-sg"
     project = var.project
     environment = var.environment
     sg_name = replace(var.sg_names[count.index], "_", "-")
